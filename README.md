@@ -70,12 +70,11 @@ The mock object is created of a given class
 
 <code>when</code> is a method in Mockito used to stub a method
 
-When <code>when</code> is called with a specific value, 
+When <code>when</code> is called with a specific value, <code>thenReturn</code> defines what is returned.
 
-<code>thenReturn</code> defines what is given back
-the method 
+<code>retrieveTodos()</code> is called internally in the SUT's method <code>todoBusinessImpl.retrieveTodosRelatedToSpring()</code>. 
 
-<code>retrieveTodos()</code> is called internally in the SUT's method <code>todoBusinessImpl.retrieveTodosRelatedToSpring()</code>.
+We can test the behaviour of the SUT's method knowing that the method that it calls returns certain values.
 
 
 
