@@ -1,13 +1,22 @@
 # mockito-examples
 Examples using Mockito in JUnit
 
-### System under test:
+### System under test
 
-The SUT is represented by a simple class in Java that contains an instance of the TodoService interface (an object that implements it), which will be the dependency 
-to be stubbed/mocked.
+The SUT is represented by
+
+* The <code>TodoBusinessImpl</code> class which contains a method, <code>retrieveTodosRelatedToSpring</code> which takes a 'user' string as input and returns a filtered <code>List</code> of Todos that contain "Spring".
+
+* The SUT has a dependency, <code>TodoService</code>, a Java interface that has a method <code>retrieveTodos</code> that takes a 'user' string as input and must return a <code>List</code> of Todos.
+
+The SUT internally makes use of the dependency's method, so we mock the dependency in order to test the SUT.
+
 
 ##### Stubbing TodoService:
-1. I created TodoServiceStub in the test directory:
+
+I used a stub before using mocking...
+
+1. I created a TodoServiceStub in the test directory:
 ```java
 public class TodoServiceStub implements TodoService {
     @Override
@@ -35,16 +44,16 @@ public class TodoBusinessImplStubTest {
 * As more scenarios are tested, more and more code needs to be written. For example, different results for different dummy users
 * If the dependency being stubbed changes, i.e. more methods are added, the stub will be outdated 
 * When there's a change in the dependency that you're stubbing, you need to change the stub
-* So, stubs requires maintenance
+* So, stubs require maintenance
 * For dynamic conditions, stubs become large and difficult
 * Stubs are good for small and simple tests
 
 ### Mocking
 
 Mocking is creating objects that simulate behaviour of real objects
-Unlike stubs, mocks can be dynamically created at runtime
-Mocks offer more functionality
-You can verify method calls and a lot more
+Unlike stubs, mocks can be dynamically created at runtime.
+Mocks offer more functionality. 
+You can verify method calls and a lot more.
 
 #####
 
@@ -74,7 +83,7 @@ When <code>when</code> is called with a specific value, <code>thenReturn</code> 
 
 <code>retrieveTodos()</code> is called internally in the SUT's method <code>todoBusinessImpl.retrieveTodosRelatedToSpring()</code>. 
 
-We can test the behaviour of the SUT's method knowing that the method that it calls returns certain values.
+We can test the behaviour of the SUT's method knowing that the dependency's method that it calls internally returns values specified by <code>thenReturn</code>.
 
 
 
