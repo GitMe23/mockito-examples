@@ -26,7 +26,6 @@ public class TodoBusinessImpl {
                 filterTodos.add(todo);
             }
         }
-
         return filterTodos;
     }
 }
