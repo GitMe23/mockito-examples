@@ -13,6 +13,7 @@ I created this repo to refer back to when using the [Mockito](https://site.mocki
 * [BDDMockito](#bddmockito)
 * [Verifying method calls](#verifying-method-calls)
 * [Argument Capture](#argument-capture)
+* [Hamcrest Matchers](#hamcrest-matchers)
 
 ### System under test
 
@@ -398,7 +399,62 @@ We verify the number of arguments instead of the value....
 then(todoServiceMock).should(times(2)).deleteTodo(stringArgumentCaptor.capture());
 assertThat(stringArgumentCaptor.getAllValues().size(), is(2));
 ```
+---
+### Hamcrest Matchers
+```java
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.MatcherAssert.assertThat;
+```
+```java
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>2.2</version>
+      <scope>test</scope>
+    </dependency>
+```
 
+Some methods like <code>hasSize()</code> seem to need an older Hamcrest dependency on top of newer version:
+```java
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>2.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3</version>
+    </dependency>
+```
+
+Hamcrest has several in-built methods to make readable assertions:
+```java
+public class HamcrestMatchersTest {
+    
+    @Test
+    public void test() {
+        List<Integer> scores = Arrays.asList(99, 100, 101, 105);
+        assertThat(scores, hasSize(4));
+        assertThat(scores, hasItems(99, 100));
+        assertThat(scores, everyItem(greaterThan(90)));
+        assertThat(scores, everyItem(lessThan(190)));
+
+        // Strings
+        assertThat("", isEmptyString());
+        assertThat(null, isEmptyOrNullString());
+
+        // Arrays
+        Integer[] marks = {1, 2, 3};
+
+        assertThat(marks, arrayWithSize(3));
+        assertThat(marks, arrayContaining(1,2,3));
+        assertThat(marks, arrayContainingInAnyOrder(2,3,1));
+    }
+}
+```
 
 
 
