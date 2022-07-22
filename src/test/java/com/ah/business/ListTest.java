@@ -2,9 +2,12 @@ package com.ah.business;
 import com.ah.data.api.TodoService;
 import org.junit.Test;
 import java.util.List;
-import static org.junit.Assert.*;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
+
 
 public class ListTest {
 
@@ -53,4 +56,16 @@ public class ListTest {
         listMock.get(0);
     }
 
+    @Test
+    public void testMockListGet_UsingBDD() {
+       // Given
+        List<String> listMock = mock(List.class);
+        given(listMock.get(anyInt())).willReturn("foo");
+
+        // When
+        String firstElement = listMock.get(0);
+
+        // Then
+        assertThat(firstElement, is("foo"));
+    }
 }

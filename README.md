@@ -3,6 +3,16 @@ Examples using Mockito in JUnit
 
 I created this repo to refer back to when using the [Mockito](https://site.mockito.org/ "Mockito Homepage") testing framework.
 
+## Jump to...
+
+* [Stubbing](#stubbing)
+* [Mockito (intro, imports)](#mockito)
+* [Argument Matchers](#argument-matchers)
+* [Default Values](#default-values)
+* [Throwing exceptions](#throwing-exceptions)
+* [BDDMockito](#bddmockito)
+* [Verifying method calls](#verifying-method-calls)
+
 ### System under test
 
 The SUT is represented by
@@ -14,7 +24,7 @@ The SUT is represented by
 The SUT internally makes use of the dependency's method, so we mock the dependency in order to test the SUT.
 
 
-##### Stubbing TodoService:
+##### Stubbing 
 
 I used a stub before using mocking...
 
@@ -49,7 +59,7 @@ public class TodoBusinessImplStubTest {
 * So, stubs require maintenance
 * For dynamic conditions, stubs become large and difficult
 * Stubs are good for small and simple tests
-
+---
 ### Mockito 
 
 ```java
@@ -82,7 +92,7 @@ import static org.mockito.Mockito.*;
     </dependency>
 ```
 
-
+---
 
 Simple example: mocking a <code>List</code> and making it return a certain value <code>when</code> one if its particular methods is called.
 ```java
@@ -141,7 +151,7 @@ We can chain multiple <code>thenReturn()</code>'s to return different values eac
         assertEquals(4, listMock.size());
     }
 ```
-
+---
 ### Default values
 When you don't specify a return value and use a mocked object's method, Mockito returns a default value:
 ```java
@@ -159,7 +169,7 @@ int | <code>0</code>
 boolean | <code>false</code>
 Object | <code>null</code>
 
-
+---
 
 
 
@@ -190,7 +200,7 @@ The following is **not** valid:
 // Not valid:
 when(listMock.subList(anyInt(), 5))
 ```
-
+---
 ### Throwing exceptions
 
 <code>thenThrow()</code> can be used instead of <code>thenReturn()</code> if used with JUnit's annotation that passes a test if a particular exception is thrown:
@@ -203,7 +213,7 @@ when(listMock.subList(anyInt(), 5))
         listMock.get(0);
     }
 ```
-
+---
 ### BDDMockito
 ```java
 import static org.mockito.BDDMockito.*;
@@ -219,7 +229,7 @@ Instead of
 ```java
 when().thenReturn()
 ```
-...<code>BDDMockito</code> uses:
+...BDDMockito uses:
 ```java
 given().willReturn()
 ```
@@ -238,12 +248,26 @@ assertThat(filteredTodos.size(), is(2));
 
 
 
-Example:
+Examples:
+```java
+    @Test
+    public void testMockListGet_UsingBDD() {
+       // Given
+        List<String> listMock = mock(List.class);
+        given(listMock.get(anyInt())).willReturn("foo");
+
+        // When
+        String firstElement = listMock.get(0);
+
+        // Then
+        assertThat(firstElement, is("foo"));
+    }
+```
 ```java
     @Test
     public void testRetrieveTodosRelatedToSpringUsingBDD() {
 
-        // Given (setup)
+        // Given
         TodoService todoServiceMock = mock(TodoService.class);
         List<String> todos = Arrays.asList("Learn Spring MVC", "Learn Spring", "Learn to Dance");
         given(todoServiceMock.retrieveTodos("Dummy")).willReturn(todos);
@@ -253,9 +277,79 @@ Example:
         List<String> filteredTodos = todoBusinessImpl.retrieveTodosRelatedToSpring("Dummy");
 
         // Then
-        assertEquals(2,  filteredTodos.size());
+        assertThat(filteredTodos.size(), is(2));
+        }
+```
+---
+
+### Verifying method calls
+
+Verify that a method in a dependency being mocked has been called.
+
+Example:
+
+We now have a method in the dependency, <code>TodoService</code>, 
+that deletes todos **not** containing "Spring".
+
+It's still the dependency being mocked, so we're simulating its return values.
+
+The dependency contains a method called <code>deleteTodo()</code>
+
+The SUT has a method <code>deleteTodosNotRelatedToSpring()</code> that uses <code>deleteTodo()</code> internally
+
+To verify that it's been called in the mocked dependency.
+
+Recall that <code>deleteTodo()</code> is called from within <code>deleteTodosNotRelatedToSpring()</code> when it iterates over a string not containing "Spring".
+<code>deleteTodo()</code> is only reached in the SUT's method if it iterates over a string not containing "Spring".
+
+
+```java
+   @Test
+    public void testDeleteTodosNotRelatedToSpringUsingBDD() {
+
+        // Given
+        TodoService todoServiceMock = mock(TodoService.class);
+
+        List<String> todos = Arrays.asList("Learn Spring MVC", "Learn Spring", "Learn to Dance");
+
+        given(todoServiceMock.retrieveTodos("Dummy")).willReturn(todos);
+
+        TodoBusinessImpl todoBusinessImpl = new TodoBusinessImpl(todoServiceMock);
+
+        // When
+        todoBusinessImpl.deleteTodosNotRelatedToSpring("Dummy");
+
+        // Then
+        verify(todoServiceMock).deleteTodo("Learn to Dance");
     }
 ```
+
+You can also verify that a method has **not** been called with <code>never()</code>. In this cae, deleteTodo() should not be called with an argument containing 'Spring':
+```java
+        verify(todoServiceMock, never()).deleteTodo("Learn Spring MVC");
+```
+Or verify that a method has been called a number of times with <code>times()</code>
+The following method should only be called once with "Learn to Dance":
+```java
+verify(todoServiceMock, times(1)).deleteTodo("Learn to Dance");
+```
+Or <code>atLeastOnce()</code> could be used:
+```java
+verify(todoServiceMock, atLeastOnce()).deleteTodo("Learn to Dance");
+```
+Also:
+
+<code>atLeast(int minNumberOfTimes)</code>
+<code>atMost(int maxNumberOfTimes)</code>
+
+
+
+
+
+
+
+
+
 
 
 
