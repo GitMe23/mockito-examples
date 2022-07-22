@@ -401,6 +401,8 @@ assertThat(stringArgumentCaptor.getAllValues().size(), is(2));
 ```
 ---
 ### Hamcrest Matchers
+
+Two different libraries but most methods live in Matchers...
 ```java
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasSize;
@@ -412,21 +414,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
       <artifactId>hamcrest-library</artifactId>
       <version>2.2</version>
       <scope>test</scope>
-    </dependency>
-```
-
-Some methods like <code>hasSize()</code> seem to need an older Hamcrest dependency on top of newer version:
-```java
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>2.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>1.3</version>
     </dependency>
 ```
 
