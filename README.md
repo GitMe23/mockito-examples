@@ -12,6 +12,7 @@ I created this repo to refer back to when using the [Mockito](https://site.mocki
 * [Throwing exceptions](#throwing-exceptions)
 * [BDDMockito](#bddmockito)
 * [Verifying method calls](#verifying-method-calls)
+* [Argument Capture](#argument-capture)
 
 ### System under test
 
@@ -246,8 +247,6 @@ assertThat(filteredTodos.size(), is(2));
 [^1]: Note that <code>assertThat()</code> and <code>is()</code> are imported from hamcrest with <code>import static org.hamcrest.CoreMatchers.*;</code> and <code>import static org.hamcrest.MatcherAssert.assertThat;
 </code>
 
-
-
 Examples:
 ```java
     @Test
@@ -297,9 +296,8 @@ The dependency contains a method called <code>deleteTodo()</code>
 
 The SUT has a method <code>deleteTodosNotRelatedToSpring()</code> that uses <code>deleteTodo()</code> internally
 
-To verify that it's been called in the mocked dependency.
+We want to verify that the method in the mocked dependency has been called.
 
-Recall that <code>deleteTodo()</code> is called from within <code>deleteTodosNotRelatedToSpring()</code> when it iterates over a string not containing "Spring".
 <code>deleteTodo()</code> is only reached in the SUT's method if it iterates over a string not containing "Spring".
 
 
@@ -341,19 +339,65 @@ Also:
 
 <code>atLeast(int minNumberOfTimes)</code>
 <code>atMost(int maxNumberOfTimes)</code>
+---
 
+### Argument Capture
 
+Better than <code>verify(todoServiceMock).deleteTodo("Learn to Dance");</code> in the above is:
+```java
+then(todoServiceMock).should().deleteTodo("Learn to Dance");
+```
+And with <code>never()</code>:
+```java
+then(todoServiceMock).should(never()).deleteTodo("Something with Spring");
+```
 
+#### ArgumentCaptor<>
 
+1. Declare Argument Captor
+2. Define Argument captor on specific method call
+3. Capture the argument
 
+Example:
+```java
+   @Test
+    @DisplayName("capturing arguments")
+    public void testArgumentCapture() {
 
+        // Declare Argument Captor
+        ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        
+        // Define Argument captor on specific method call
 
+        // Given
+        TodoService todoServiceMock = mock(TodoService.class);
 
+        List<String> todos = Arrays.asList("Learn Spring MVC", "Learn Spring", "Learn to Dance");
 
+        given(todoServiceMock.retrieveTodos("Dummy")).willReturn(todos);
 
+        TodoBusinessImpl todoBusinessImpl = new TodoBusinessImpl(todoServiceMock);
 
+        // When
+        todoBusinessImpl.deleteTodosNotRelatedToSpring("Dummy");
 
+        // capturing the argument:
+        then(todoServiceMock).should().deleteTodo(stringArgumentCaptor.capture());
 
+        // check that the argument is the non 'Spring'
+        assertThat(stringArgumentCaptor.getValue(), is("Learn To Dance"));
+    }
+```
+#### Capturing arguments when a method is called multiple times
+
+Adding another non 'Spring' todo to the list so that the method runs more than once...
+
+We use <code>getAllValues()</code> with <code>times()</code> and <code>size()</code>instead of <code>getValue()</code>. 
+We verify the number of arguments instead of the value....
+```java
+then(todoServiceMock).should(times(2)).deleteTodo(stringArgumentCaptor.capture());
+assertThat(stringArgumentCaptor.getAllValues().size(), is(2));
+```
 
 
 
