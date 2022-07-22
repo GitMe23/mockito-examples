@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 
 public class TodoBusinessImplStubTest {
 
+
     @Test
     public void testRetrieveTodosRelatedToSpringUsingAStub() {
         TodoService todoServiceStub = new TodoServiceStub();
